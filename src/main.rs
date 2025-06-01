@@ -151,7 +151,7 @@ fn setup_game(mut commands: Commands, asset_server: Res<AssetServer>) {
         TextBundle::from_section(
             "Left: 0  Right: 0",
             TextStyle {
-                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font: asset_server.load("FiraMono-Medium.ttf"),
                 font_size: 40.0,
                 color: SCORE_TEXT_COLOR,
             },
