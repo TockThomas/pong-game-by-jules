@@ -22,9 +22,8 @@ struct Paddle;
 #[derive(Component)]
 struct Ball;
 
-#[derive(Component, Deref, DerefMut)]
+#[derive(Component, Debug, Copy, Clone, PartialEq)]
 struct Position {
-    #[deref]
     x: f32,
     y: f32,
 }
@@ -35,9 +34,8 @@ struct Size {
     height: f32,
 }
 
-#[derive(Component, Deref, DerefMut)]
+#[derive(Component, Debug, Copy, Clone, PartialEq)]
 struct Velocity {
-    #[deref]
     x: f32,
     y: f32,
 }
@@ -54,6 +52,16 @@ struct Score {
 // Marker component for the score text UI entity
 #[derive(Component)]
 struct ScoreText;
+
+fn update_sprite_transforms_from_position(
+    mut query: Query<(&mut Transform, &Position)>,
+) {
+    for (mut transform, position) in query.iter_mut() {
+        transform.translation.x = position.x;
+        transform.translation.y = position.y;
+        // transform.translation.z is not managed by Position, so leave it as is.
+    }
+}
 
 fn main() {
     use bevy::prelude::*;
@@ -74,8 +82,11 @@ fn main() {
         .add_systems(Update,
             (
                 move_paddles_system,
-                (move_ball_system, collision_system, scoring_system).chain(),
-                update_score_display_system,
+                move_ball_system,
+                update_sprite_transforms_from_position.after(move_paddles_system).after(move_ball_system),
+                collision_system.after(update_sprite_transforms_from_position),
+                scoring_system.after(collision_system),
+                update_score_display_system.after(scoring_system),
             )
         )
         .run();
@@ -148,7 +159,7 @@ fn setup_game(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_style(Style {
             position_type: PositionType::Absolute,
             top: Val::Px(10.0),
-            align_self: AlignSelf::Center,
+            left: Val::Px(10.0),
             ..default()
         }),
         ScoreText,
