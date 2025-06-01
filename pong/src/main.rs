@@ -24,6 +24,7 @@ struct Ball;
 
 #[derive(Component, Deref, DerefMut)]
 struct Position {
+    #[deref]
     x: f32,
     y: f32,
 }
@@ -36,6 +37,7 @@ struct Size {
 
 #[derive(Component, Deref, DerefMut)]
 struct Velocity {
+    #[deref]
     x: f32,
     y: f32,
 }
@@ -54,6 +56,8 @@ struct Score {
 struct ScoreText;
 
 fn main() {
+    use bevy::prelude::*;
+
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
